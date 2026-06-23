@@ -10,8 +10,6 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
   move_base_msgs
-  cv_bridge
-  vision_msgs
   message_generation
 )
 
@@ -42,8 +40,6 @@ catkin_package(
     actionlib
     actionlib_msgs
     move_base_msgs
-    cv_bridge
-    vision_msgs
     message_runtime
 )
 
