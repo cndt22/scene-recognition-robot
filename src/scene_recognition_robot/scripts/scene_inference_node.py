@@ -10,6 +10,33 @@ from collections import Counter
 from scene_recognition_robot.msg import DetectedObjectArray, SceneResult
 
 
+DEFAULT_OBJECT_NAMES_CN = {
+    "bed": "床",
+    "pillow": "枕头",
+    "wardrobe": "衣柜",
+    "nightstand": "床头柜",
+    "dining table": "餐桌",
+    "table": "桌子",
+    "chair": "椅子",
+    "bowl": "碗",
+    "cup": "杯子",
+    "plate": "盘子",
+    "food": "食物",
+    "refrigerator": "冰箱",
+    "microwave": "微波炉",
+    "oven": "烤箱",
+    "sink": "水槽",
+    "toaster": "烤面包机",
+    "couch": "沙发",
+    "sofa": "沙发",
+    "tv": "电视",
+    "remote": "遥控器",
+    "coffee table": "茶几",
+    "toilet": "马桶",
+    "bathtub": "浴缸",
+}
+
+
 class SceneInferenceNode:
     def __init__(self):
         rospy.init_node("scene_inference_node")
@@ -25,14 +52,21 @@ class SceneInferenceNode:
         self.scenes = self.rules.get("scenes", {})
         self.aliases = self.rules.get("label_aliases", {})
         self.object_names_cn = self.rules.get("object_names_cn", {})
+        if not self.object_names_cn:
+            self.object_names_cn = DEFAULT_OBJECT_NAMES_CN
         self.history_size = rospy.get_param("~history_size", 5)
         self.detection_history = []
         self.last_logged_scene = None
+        self.last_logged_objects = None
 
         self.pub = rospy.Publisher("/scene_result", SceneResult, queue_size=10)
         self.sub = rospy.Subscriber("/detected_objects", DetectedObjectArray, self.callback, queue_size=10)
 
-        rospy.loginfo("scene_inference_node 已启动，规则文件: %s", rules_path)
+        rospy.loginfo(
+            "scene_inference_node 已启动，规则: %s，中文物体映射 %d 条",
+            rules_path,
+            len(self.object_names_cn),
+        )
 
     def _normalize_label(self, label):
         label = label.lower().strip()
@@ -136,13 +170,15 @@ class SceneInferenceNode:
         out.all_detected_objects = self._labels_to_cn_unique(labels)
 
         self.pub.publish(out)
-        if scene_id != self.last_logged_scene:
+        objects_str = "、".join(out.matched_objects)
+        if (scene_id, objects_str) != (self.last_logged_scene, self.last_logged_objects):
             self.last_logged_scene = scene_id
+            self.last_logged_objects = objects_str
             rospy.loginfo(
                 "场景识别: %s (%s)，匹配物体: %s",
                 out.room_name_cn,
                 out.room_type,
-                ", ".join(out.matched_objects),
+                objects_str,
             )
 
 
