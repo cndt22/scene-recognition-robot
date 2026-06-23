@@ -86,7 +86,7 @@
     <node pkg="scene_recognition_robot" type="rosrun_src.sh" name="mission_controller_node" output="screen"
           args="mission_controller_node.py">
       <param name="simulate_navigation" value="false"/>
-      <param name="start_delay" value="10.0"/>
+      <param name="start_delay" value="15.0"/>
       <param name="mission_file" value="$(find scene_recognition_robot)/config/mission_gazebo.yaml"/>
     </node>
   </group>
