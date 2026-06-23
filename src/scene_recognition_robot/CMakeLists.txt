@@ -57,6 +57,26 @@ catkin_install_python(PROGRAMS
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+# 每次编译后强制把 scripts 复制到 devel，避免运行旧脚本
+add_custom_command(
+  OUTPUT ${CATKIN_DEVEL_PREFIX}/lib/${PROJECT_NAME}/.scripts_synced
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${CATKIN_DEVEL_PREFIX}/lib/${PROJECT_NAME}
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/scripts ${CATKIN_DEVEL_PREFIX}/lib/${PROJECT_NAME}
+  COMMAND ${CMAKE_COMMAND} -E touch ${CATKIN_DEVEL_PREFIX}/lib/${PROJECT_NAME}/.scripts_synced
+  DEPENDS
+    scripts/scene_inference_node.py
+    scripts/mission_controller_node.py
+    scripts/tts_node.py
+    scripts/gazebo_gt_detection_node.py
+    scripts/object_detection_node.py
+    scripts/generate_house_map.py
+  COMMENT "Syncing Python scripts to devel"
+)
+
+add_custom_target(${PROJECT_NAME}_sync_scripts ALL
+  DEPENDS ${CATKIN_DEVEL_PREFIX}/lib/${PROJECT_NAME}/.scripts_synced
+)
+
 install(DIRECTORY launch config rviz worlds maps
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
