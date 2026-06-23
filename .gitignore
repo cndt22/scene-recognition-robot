@@ -1,0 +1,22 @@
+# Catkin
+build/
+devel/
+.catkin_workspace
+logs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# Archives / generated
+*.zip
+install/project.tar.gz
+install/project.tar.gz.b64

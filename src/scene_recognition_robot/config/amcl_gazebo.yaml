@@ -1,0 +1,23 @@
+# AMCL 参数（TurtleBot3 + scene_house 地图）
+
+min_particles: 500
+max_particles: 2000
+kld_err: 0.05
+update_min_d: 0.2
+update_min_a: 0.5
+resample_interval: 1
+transform_tolerance: 0.5
+recovery_alpha_slow: 0.0
+recovery_alpha_fast: 0.0
+initial_pose_x: 0.8
+initial_pose_y: 0.8
+initial_pose_a: 0.0
+gui_publish_rate: 10.0
+laser_max_range: 3.5
+laser_min_range: 0.12
+laser_max_beams: 180
+odom_model_type: diff
+odom_alpha1: 0.1
+odom_alpha2: 0.1
+odom_alpha3: 0.1
+odom_alpha4: 0.1

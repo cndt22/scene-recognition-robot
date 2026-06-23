@@ -1,0 +1,60 @@
+# 场景识别规则：根据检测到的物体推断房间类型
+# min_matches: 至少匹配多少个规则物体
+# priority: 多场景同时匹配时取优先级最高者
+
+scenes:
+  bedroom:
+    name_cn: "卧室"
+    min_matches: 1
+    priority: 10
+    objects:
+      - bed
+      - pillow
+      - wardrobe
+      - nightstand
+
+  dining_room:
+    name_cn: "餐厅"
+    min_matches: 2
+    priority: 9
+    # 桌子 + 食物 -> 餐厅（课设示例）
+    required_groups:
+      - [dining table, table]
+      - [food, bowl, cup, plate, banana, apple, sandwich, pizza]
+
+  kitchen:
+    name_cn: "厨房"
+    min_matches: 1
+    priority: 8
+    objects:
+      - refrigerator
+      - microwave
+      - oven
+      - sink
+      - toaster
+
+  living_room:
+    name_cn: "客厅"
+    min_matches: 1
+    priority: 7
+    objects:
+      - couch
+      - sofa
+      - tv
+      - remote
+      - coffee table
+
+  bathroom:
+    name_cn: "卫生间"
+    min_matches: 1
+    priority: 11
+    objects:
+      - toilet
+      - bathtub
+      - sink
+
+# 物体标签别名（YOLO COCO 类别映射）
+label_aliases:
+  dining table: [dining table, table]
+  sofa: [couch, sofa]
+  food: [food, banana, apple, sandwich, pizza, orange, broccoli, carrot, hot dog, donut, cake]

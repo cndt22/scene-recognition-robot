@@ -1,0 +1,16 @@
+# 通用 costmap 参数（TurtleBot / 差分驱动底盘）
+
+footprint: [[-0.2, -0.2], [-0.2, 0.2], [0.2, 0.2], [0.2, -0.2]]
+robot_radius: 0.2
+
+obstacle_range: 2.5
+raytrace_range: 3.0
+inflation_radius: 0.15
+cost_scaling_factor: 3.0
+
+observation_sources: scan
+scan:
+  data_type: LaserScan
+  topic: /scan
+  marking: true
+  clearing: true

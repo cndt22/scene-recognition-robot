@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- 无实体机器人：mock 检测 + 模拟导航 + 语音播报 -->
+  <include file="$(find scene_recognition_robot)/launch/scene_recognition.launch">
+    <arg name="mock_detection" value="true"/>
+  </include>
+
+  <node pkg="scene_recognition_robot" type="mission_controller_node.py" name="mission_controller_node" output="screen">
+    <param name="simulate_navigation" value="true"/>
+    <param name="detection_duration" value="4.0"/>
+    <param name="min_detection_frames" value="2"/>
+  </node>
+</launch>

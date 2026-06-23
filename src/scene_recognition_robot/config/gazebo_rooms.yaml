@@ -1,0 +1,36 @@
+# Gazebo 仿真：房间区域与对应物体（真值检测）
+# 坐标系: map (与 Gazebo 世界一致，原点西南角)
+
+rooms:
+  bedroom:
+    name_cn: "卧室"
+    # 矩形区域 [x_min, y_min, x_max, y_max]
+    bounds: [0.3, 0.3, 4.7, 4.7]
+    objects:
+      - bed
+      - pillow
+
+  dining_room:
+    name_cn: "餐厅"
+    bounds: [5.3, 0.3, 9.7, 4.7]
+    objects:
+      - dining table
+      - chair
+      - bowl
+
+  kitchen:
+    name_cn: "厨房"
+    bounds: [0.3, 5.3, 4.7, 9.7]
+    objects:
+      - refrigerator
+      - microwave
+
+  living_room:
+    name_cn: "客厅"
+    bounds: [5.3, 5.3, 9.7, 9.7]
+    objects:
+      - couch
+      - tv
+
+# 机器人在房间区域内即认为"看到"该房间物体
+detection_pose_topic: "/amcl_pose"

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- 场景识别核心节点（无导航，适合 mock 调试） -->
+  <arg name="mock_detection" default="true"/>
+  <arg name="confidence_threshold" default="0.45"/>
+
+  <node pkg="scene_recognition_robot" type="object_detection_node.py" name="object_detection_node" output="screen">
+    <param name="mock_mode" value="$(arg mock_detection)"/>
+    <param name="confidence_threshold" value="$(arg confidence_threshold)"/>
+    <param name="image_topic" value="/camera/image_raw"/>
+    <param name="model_path" value="yolov8n.pt"/>
+  </node>
+
+  <node pkg="scene_recognition_robot" type="scene_inference_node.py" name="scene_inference_node" output="screen">
+    <param name="history_size" value="5"/>
+  </node>
+
+  <node pkg="scene_recognition_robot" type="tts_node.py" name="tts_node" output="screen">
+    <param name="engine" value="espeak"/>
+    <param name="default_language" value="zh"/>
+    <param name="rate" value="150"/>
+  </node>
+</launch>

@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Gazebo 仿真一键启动：TurtleBot3 + 四室场景 + 导航 + 识别 + 播报 -->
+
+  <arg name="model" default="waffle_pi"/>
+  <arg name="x_pos" default="0.8"/>
+  <arg name="y_pos" default="0.8"/>
+  <arg name="z_pos" default="0.0"/>
+  <arg name="yaw" default="0.0"/>
+  <arg name="gui" default="true"/>
+  <arg name="use_yolo" default="false"/>
+  <arg name="paused" default="false"/>
+  <arg name="run_mission" default="true"/>
+
+  <env name="TURTLEBOT3_MODEL" value="$(arg model)"/>
+
+  <!-- ========== Gazebo 世界 ========== -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find scene_recognition_robot)/worlds/scene_house.world"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!-- ========== 生成 TurtleBot3 ========== -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro"/>
+
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"
+        args="-urdf -model turtlebot3_$(arg model) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yaw) -param robot_description"/>
+
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="use_sim_time" value="true"/>
+  </node>
+
+  <!-- ========== 地图与定位 ========== -->
+  <node pkg="map_server" type="map_server" name="map_server"
+        args="$(find scene_recognition_robot)/maps/house_map.yaml"/>
+
+  <node pkg="amcl" type="amcl" name="amcl">
+    <rosparam file="$(find scene_recognition_robot)/config/amcl_gazebo.yaml" command="load"/>
+    <param name="use_sim_time" value="true"/>
+    <param name="odom_frame_id" value="odom"/>
+    <param name="base_frame_id" value="base_footprint"/>
+    <param name="global_frame_id" value="map"/>
+    <param name="scan_topic" value="/scan"/>
+  </node>
+
+  <!-- ========== move_base 导航 ========== -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <param name="use_sim_time" value="true"/>
+    <rosparam file="$(find scene_recognition_robot)/config/costmap_common.yaml" command="load" ns="global_costmap"/>
+    <rosparam file="$(find scene_recognition_robot)/config/costmap_common.yaml" command="load" ns="local_costmap"/>
+    <rosparam file="$(find scene_recognition_robot)/config/local_costmap.yaml" command="load"/>
+    <rosparam file="$(find scene_recognition_robot)/config/global_costmap.yaml" command="load"/>
+    <rosparam file="$(find scene_recognition_robot)/config/move_base.yaml" command="load"/>
+  </node>
+
+  <!-- ========== 场景识别 ========== -->
+  <group if="$(arg use_yolo)">
+    <node pkg="scene_recognition_robot" type="object_detection_node.py" name="object_detection_node" output="screen">
+      <param name="mock_mode" value="false"/>
+      <param name="image_topic" value="/camera/image_raw"/>
+      <param name="model_path" value="yolov8n.pt"/>
+    </node>
+  </group>
+
+  <group unless="$(arg use_yolo)">
+    <node pkg="scene_recognition_robot" type="gazebo_gt_detection_node.py" name="gazebo_gt_detection_node" output="screen"/>
+  </group>
+
+  <node pkg="scene_recognition_robot" type="scene_inference_node.py" name="scene_inference_node" output="screen"/>
+
+  <node pkg="scene_recognition_robot" type="tts_node.py" name="tts_node" output="screen">
+    <param name="engine" value="auto"/>
+    <param name="default_language" value="zh"/>
+  </node>
+
+  <!-- 等待 Gazebo / AMCL 就绪后启动任务 -->
+  <group if="$(arg run_mission)">
+    <node pkg="scene_recognition_robot" type="mission_controller_node.py" name="mission_controller_node" output="screen">
+      <param name="simulate_navigation" value="false"/>
+      <param name="start_delay" value="10.0"/>
+      <param name="mission_file" value="$(find scene_recognition_robot)/config/mission_gazebo.yaml"/>
+    </node>
+  </group>
+
+  <!-- RViz 可视化（可选） -->
+  <arg name="rviz" default="true"/>
+  <group if="$(arg rviz)">
+    <node pkg="rviz" type="rviz" name="rviz" required="false"
+          args="-d $(find turtlebot3_navigation)/rviz/turtlebot3_navigation.rviz"/>
+  </group>
+
+</launch>

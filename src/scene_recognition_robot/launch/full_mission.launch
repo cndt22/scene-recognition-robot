@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- 完整任务：导航 + 识别 + 播报 -->
+  <arg name="mock_detection" default="false"/>
+  <arg name="simulate_navigation" default="false"/>
+  <arg name="map_file" default=""/>
+  <arg name="use_amcl" default="true"/>
+
+  <include file="$(find scene_recognition_robot)/launch/scene_recognition.launch">
+    <arg name="mock_detection" value="$(arg mock_detection)"/>
+  </include>
+
+  <!-- 导航栈（需要已有地图；map_file 为空则跳过 map_server） -->
+  <group if="$(eval map_file != '')">
+    <node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)"/>
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+      <rosparam file="$(find scene_recognition_robot)/config/costmap_common.yaml" command="load" ns="global_costmap"/>
+      <rosparam file="$(find scene_recognition_robot)/config/costmap_common.yaml" command="load" ns="local_costmap"/>
+      <rosparam file="$(find scene_recognition_robot)/config/local_costmap.yaml" command="load"/>
+      <rosparam file="$(find scene_recognition_robot)/config/global_costmap.yaml" command="load"/>
+      <rosparam file="$(find scene_recognition_robot)/config/move_base.yaml" command="load"/>
+    </node>
+
+    <group if="$(arg use_amcl)">
+      <include file="$(find amcl)/examples/amcl_diff.launch"/>
+    </group>
+  </group>
+
+  <node pkg="scene_recognition_robot" type="mission_controller_node.py" name="mission_controller_node" output="screen">
+    <param name="simulate_navigation" value="$(arg simulate_navigation)"/>
+  </node>
+</launch>

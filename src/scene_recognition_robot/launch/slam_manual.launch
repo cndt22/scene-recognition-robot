@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- 手动遥控建图：Gazebo + gmapping（不含 move_base / 固定地图） -->
+
+  <arg name="model" default="waffle_pi"/>
+  <arg name="x_pos" default="1.5"/>
+  <arg name="y_pos" default="1.5"/>
+  <arg name="gui" default="true"/>
+
+  <env name="TURTLEBOT3_MODEL" value="$(arg model)"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find scene_recognition_robot)/worlds/scene_house.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="$(arg gui)"/>
+  </include>
+
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro"/>
+
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"
+        args="-urdf -model turtlebot3_$(arg model) -x $(arg x_pos) -y $(arg y_pos) -z 0.0 -Y 0.0 -param robot_description"/>
+
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="use_sim_time" value="true"/>
+  </node>
+
+  <!-- SLAM 建图 -->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <param name="use_sim_time" value="true"/>
+    <param name="base_frame" value="base_footprint"/>
+    <param name="odom_frame" value="odom"/>
+    <param name="map_frame" value="map"/>
+    <param name="map_update_interval" value="1.0"/>
+    <param name="maxUrange" value="3.0"/>
+    <param name="minimumScore" value="50"/>
+    <param name="linearUpdate" value="0.2"/>
+    <param name="angularUpdate" value="0.2"/>
+    <param name="temporalUpdate" value="0.5"/>
+    <param name="delta" value="0.05"/>
+    <param name="particles" value="30"/>
+  </node>
+
+  <node pkg="rviz" type="rviz" name="rviz" required="false"
+        args="-d $(find turtlebot3_navigation)/rviz/turtlebot3_navigation.rviz"/>
+
+</launch>

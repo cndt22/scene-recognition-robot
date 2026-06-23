@@ -1,0 +1,41 @@
+# Gazebo scene_house.world 对应的任务导航点
+
+rooms:
+  - id: bedroom
+    name: "卧室"
+    pose:
+      x: 1.2
+      y: 1.2
+      yaw: 0.0
+
+  - id: dining_room
+    name: "餐厅"
+    pose:
+      x: 6.5
+      y: 2.5
+      yaw: 3.14
+
+  # 餐厅北侧直行即可到达，比从厨房横穿地图更容易
+  - id: living_room
+    name: "客厅"
+    pose:
+      x: 6.5
+      y: 6.2
+      yaw: 0.0
+
+  - id: kitchen
+    name: "厨房"
+    pose:
+      x: 3.5
+      y: 7.5
+      yaw: 1.57
+
+# 起始/汇报位置（绿色标记柱旁）
+report_pose:
+  x: 0.8
+  y: 0.8
+  yaw: 0.78
+
+detection_duration: 4.0
+confidence_threshold: 0.45
+min_detection_frames: 2

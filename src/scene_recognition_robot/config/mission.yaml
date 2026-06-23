@@ -1,0 +1,39 @@
+# 待探索房间导航点（map 坐标系）
+# 机器人依次前往各房间入口进行场景识别
+
+rooms:
+  - id: room_1
+    name: "房间一"
+    pose:
+      x: 2.0
+      y: 1.0
+      yaw: 0.0
+
+  - id: room_2
+    name: "房间二"
+    pose:
+      x: 5.0
+      y: 3.0
+      yaw: 1.57
+
+  - id: room_3
+    name: "房间三"
+    pose:
+      x: 1.0
+      y: 4.5
+      yaw: -1.57
+
+# 识别完成后汇报位置
+report_pose:
+  x: 0.0
+  y: 0.0
+  yaw: 0.0
+
+# 每个房间停留检测时间（秒）
+detection_duration: 5.0
+
+# 物体检测置信度阈值
+confidence_threshold: 0.45
+
+# 场景推理所需最少检测帧数（取众数）
+min_detection_frames: 3
