@@ -26,6 +26,7 @@ class SceneInferenceNode:
         self.aliases = self.rules.get("label_aliases", {})
         self.history_size = rospy.get_param("~history_size", 5)
         self.detection_history = []
+        self.last_logged_scene = None
 
         self.pub = rospy.Publisher("/scene_result", SceneResult, queue_size=10)
         self.sub = rospy.Subscriber("/detected_objects", DetectedObjectArray, self.callback, queue_size=10)
@@ -117,12 +118,14 @@ class SceneInferenceNode:
         out.all_detected_objects = sorted(labels)
 
         self.pub.publish(out)
-        rospy.loginfo(
-            "场景识别: %s (%s)，匹配物体: %s",
-            out.room_name_cn,
-            out.room_type,
-            ", ".join(out.matched_objects),
-        )
+        if scene_id != self.last_logged_scene:
+            self.last_logged_scene = scene_id
+            rospy.loginfo(
+                "场景识别: %s (%s)，匹配物体: %s",
+                out.room_name_cn,
+                out.room_type,
+                ", ".join(out.matched_objects),
+            )
 
 
 if __name__ == "__main__":
