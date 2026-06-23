@@ -24,6 +24,7 @@ class SceneInferenceNode:
 
         self.scenes = self.rules.get("scenes", {})
         self.aliases = self.rules.get("label_aliases", {})
+        self.object_names_cn = self.rules.get("object_names_cn", {})
         self.history_size = rospy.get_param("~history_size", 5)
         self.detection_history = []
         self.last_logged_scene = None
@@ -39,6 +40,23 @@ class SceneInferenceNode:
             if label == canonical or label in variants:
                 return canonical
         return label
+
+    def _label_to_cn(self, label):
+        key = self._normalize_label(label)
+        if key in self.object_names_cn:
+            return self.object_names_cn[key]
+        raw = label.lower().strip()
+        return self.object_names_cn.get(raw, label)
+
+    def _labels_to_cn_unique(self, labels):
+        seen = set()
+        result = []
+        for label in labels:
+            cn = self._label_to_cn(label)
+            if cn not in seen:
+                seen.add(cn)
+                result.append(cn)
+        return result
 
     def _labels_from_msg(self, msg):
         labels = set()
@@ -114,8 +132,8 @@ class SceneInferenceNode:
         out.room_type = scene_id
         out.room_name_cn = cfg.get("name_cn", scene_id)
         out.confidence = min(1.0, len(matched) / max(cfg.get("min_matches", 1), 1))
-        out.matched_objects = list(set(matched))
-        out.all_detected_objects = sorted(labels)
+        out.matched_objects = self._labels_to_cn_unique(matched)
+        out.all_detected_objects = self._labels_to_cn_unique(labels)
 
         self.pub.publish(out)
         if scene_id != self.last_logged_scene:

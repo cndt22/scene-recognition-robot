@@ -58,3 +58,33 @@ label_aliases:
   dining table: [dining table, table]
   sofa: [couch, sofa]
   food: [food, banana, apple, sandwich, pizza, orange, broccoli, carrot, hot dog, donut, cake]
+
+# 物体中文名称（日志、播报、SceneResult 输出）
+object_names_cn:
+  bed: "床"
+  pillow: "枕头"
+  wardrobe: "衣柜"
+  nightstand: "床头柜"
+  dining table: "餐桌"
+  table: "桌子"
+  chair: "椅子"
+  bowl: "碗"
+  cup: "杯子"
+  plate: "盘子"
+  food: "食物"
+  banana: "香蕉"
+  apple: "苹果"
+  sandwich: "三明治"
+  pizza: "披萨"
+  refrigerator: "冰箱"
+  microwave: "微波炉"
+  oven: "烤箱"
+  sink: "水槽"
+  toaster: "烤面包机"
+  couch: "沙发"
+  sofa: "沙发"
+  tv: "电视"
+  remote: "遥控器"
+  "coffee table": "茶几"
+  toilet: "马桶"
+  bathtub: "浴缸"
