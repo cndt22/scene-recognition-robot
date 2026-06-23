@@ -71,8 +71,12 @@ class MissionControllerNode:
                 self.simulate_navigation = True
 
         rospy.Subscriber("/scene_result", SceneResult, self.scene_callback, queue_size=10)
-        rospy.wait_for_service("/announce_scene", timeout=10.0)
-        self.announce = rospy.ServiceProxy("/announce_scene", AnnounceScene)
+        self.announce = None
+        try:
+            rospy.wait_for_service("/announce_scene", timeout=15.0)
+            self.announce = rospy.ServiceProxy("/announce_scene", AnnounceScene)
+        except rospy.ROSException:
+            rospy.logwarn("播报服务暂不可用，任务继续（无语音播报）")
 
         rospy.loginfo("mission_controller_node 已启动，共 %d 个房间", len(self.rooms))
 
@@ -199,15 +203,18 @@ class MissionControllerNode:
         # 语音播报
         text = self.build_announcement()
         rospy.loginfo("播报内容: %s", text)
-        try:
-            req = AnnounceSceneRequest()
-            req.text = text
-            req.language = "zh"
-            resp = self.announce(req)
-            if not resp.success:
-                rospy.logwarn("播报失败: %s", resp.message)
-        except rospy.ServiceException as exc:
-            rospy.logerr("调用播报服务失败: %s", exc)
+        if self.announce is None:
+            rospy.logwarn("跳过语音播报：/announce_scene 不可用")
+        else:
+            try:
+                req = AnnounceSceneRequest()
+                req.text = text
+                req.language = "zh"
+                resp = self.announce(req)
+                if not resp.success:
+                    rospy.logwarn("播报失败: %s", resp.message)
+            except rospy.ServiceException as exc:
+                rospy.logerr("调用播报服务失败: %s", exc)
 
         rospy.loginfo("任务完成")
 
