@@ -59,7 +59,8 @@
 
   <!-- ========== 场景识别 ========== -->
   <group if="$(arg use_yolo)">
-    <node pkg="scene_recognition_robot" type="object_detection_node.py" name="object_detection_node" output="screen">
+    <node pkg="scene_recognition_robot" type="rosrun_src.sh" name="object_detection_node" output="screen"
+          args="object_detection_node.py">
       <param name="mock_mode" value="false"/>
       <param name="image_topic" value="/camera/image_raw"/>
       <param name="model_path" value="yolov8n.pt"/>
@@ -67,19 +68,23 @@
   </group>
 
   <group unless="$(arg use_yolo)">
-    <node pkg="scene_recognition_robot" type="gazebo_gt_detection_node.py" name="gazebo_gt_detection_node" output="screen"/>
+    <node pkg="scene_recognition_robot" type="rosrun_src.sh" name="gazebo_gt_detection_node" output="screen"
+          args="gazebo_gt_detection_node.py"/>
   </group>
 
-  <node pkg="scene_recognition_robot" type="scene_inference_node.py" name="scene_inference_node" output="screen"/>
+  <node pkg="scene_recognition_robot" type="rosrun_src.sh" name="scene_inference_node" output="screen"
+        args="scene_inference_node.py"/>
 
-  <node pkg="scene_recognition_robot" type="tts_node.py" name="tts_node" output="screen">
+  <node pkg="scene_recognition_robot" type="rosrun_src.sh" name="tts_node" output="screen"
+        args="tts_node.py">
     <param name="engine" value="auto"/>
     <param name="default_language" value="zh"/>
   </node>
 
   <!-- 等待 Gazebo / AMCL 就绪后启动任务 -->
   <group if="$(arg run_mission)">
-    <node pkg="scene_recognition_robot" type="mission_controller_node.py" name="mission_controller_node" output="screen">
+    <node pkg="scene_recognition_robot" type="rosrun_src.sh" name="mission_controller_node" output="screen"
+          args="mission_controller_node.py">
       <param name="simulate_navigation" value="false"/>
       <param name="start_delay" value="10.0"/>
       <param name="mission_file" value="$(find scene_recognition_robot)/config/mission_gazebo.yaml"/>

@@ -48,6 +48,7 @@ include_directories(
 )
 
 catkin_install_python(PROGRAMS
+  scripts/rosrun_src.sh
   scripts/object_detection_node.py
   scripts/scene_inference_node.py
   scripts/mission_controller_node.py
@@ -64,6 +65,7 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/scripts ${CATKIN_DEVEL_PREFIX}/lib/${PROJECT_NAME}
   COMMAND ${CMAKE_COMMAND} -E touch ${CATKIN_DEVEL_PREFIX}/lib/${PROJECT_NAME}/.scripts_synced
   DEPENDS
+    scripts/rosrun_src.sh
     scripts/scene_inference_node.py
     scripts/mission_controller_node.py
     scripts/tts_node.py
