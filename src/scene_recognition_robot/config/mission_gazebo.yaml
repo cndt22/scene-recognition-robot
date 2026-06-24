@@ -32,9 +32,9 @@ rooms:
 
 # 起始/汇报位置（绿色标记柱旁）
 report_pose:
-  x: 0.8
-  y: 0.8
-  yaw: 0.78
+  x: 2.0
+  y: 2.0
+  yaw: 0.0
 
 detection_duration: 4.0
 confidence_threshold: 0.45
